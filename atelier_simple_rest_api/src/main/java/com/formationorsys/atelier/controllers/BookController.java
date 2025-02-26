@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.formationorsys.atelier.models.Book;
 import com.formationorsys.atelier.service.BookService;
+import com.formationorsys.atelier.service.UserService;
 
 @RestController
 @RequestMapping(path = "/api/v1/")
@@ -26,9 +27,20 @@ public class BookController {
 	@Autowired
 	BookService bookService;
 	
+	@Autowired
+	UserService userService;
+	
 	// Récupérer l'ensemble des livres
 	@GetMapping(path = "/books", produces = "application/json")
-	public ResponseEntity<List<Book>> getBooks(){
+	public ResponseEntity<List<Book>> getBooks(
+			@RequestHeader(value = "X-API-KEY") String apiKey,
+            @RequestHeader(value = "X-API-SECRET") String apiSecret
+			){
+		
+		  // Validate API Key & Secret
+        if (!userService.isValidApiKey(apiKey, apiSecret)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 		try {
 			return new ResponseEntity<List<Book>>(bookService.getBooks(),HttpStatus.OK);
 		} catch (Exception e) {

@@ -26,9 +26,21 @@ public class BookController {
 	@Autowired
 	BookService bookService;
 	
+	// Hardcoded API Key & Secret
+	private static final String API_KEY = "my-api-key";
+	private static final String API_SECRET = "my-api-secret";
+	
+	
 	// Récupérer l'ensemble des livres
 	@GetMapping(path = "/books", produces = "application/json")
-	public ResponseEntity<List<Book>> getBooks(){
+	public ResponseEntity<List<Book>> getBooks(
+			@RequestHeader(value="X-API-KEY", required = true) String apiKey,
+			@RequestHeader(value="X-API-SECRET", required = true) String apiSecret
+			){
+		if(!API_KEY.equals(apiKey) || !API_SECRET.equals(apiSecret)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		
 		try {
 			return new ResponseEntity<List<Book>>(bookService.getBooks(),HttpStatus.OK);
 		} catch (Exception e) {

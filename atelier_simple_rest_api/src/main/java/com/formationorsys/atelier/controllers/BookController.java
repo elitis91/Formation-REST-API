@@ -4,6 +4,7 @@ package com.formationorsys.atelier.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +24,26 @@ import com.formationorsys.atelier.service.BookService;
 @RequestMapping(path = "/api/v1/")
 public class BookController {
 	
+	@Value("${api.key}")
+	private String apiKey;
+	
+	@Value("${api.secret}")
+	private String apiSecret;
+	
 	@Autowired
 	BookService bookService;
 	
 	// Récupérer l'ensemble des livres
 	@GetMapping(path = "/books", produces = "application/json")
-	public ResponseEntity<List<Book>> getBooks(){
+	public ResponseEntity<List<Book>> getBooks(
+			@RequestHeader(value = "X-API-KEY", required = true) String providedKey,
+            @RequestHeader(value = "X-API-SECRET", required = true) String providedSecret
+			) {
+       
+		if (!apiKey.equals(providedKey) || !apiSecret.equals(providedSecret)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+		
 		try {
 			return new ResponseEntity<List<Book>>(bookService.getBooks(),HttpStatus.OK);
 		} catch (Exception e) {

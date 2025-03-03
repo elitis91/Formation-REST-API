@@ -57,6 +57,13 @@
 			<version>2.0.3</version>  
 		</dependency>
 		
+		<!-- Ajout hateoas -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+
+		
 	</dependencies>
 
 	<build>
